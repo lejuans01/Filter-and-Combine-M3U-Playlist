@@ -6,93 +6,115 @@
   <title>Filter and Combine M3U Playlist</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f9;
-      color: #333;
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: var(--background-color, #f4f4f9);
+        color: var(--text-color, #333);
     }
     h1 {
-      text-align: center;
-      color: #444;
-      margin-bottom: 20px;
+        text-align: center;
+        color: var(--header-color, #444);
+        margin-bottom: 20px;
     }
     .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        background-color: var(--container-bg, #fff);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .input-section {
-      text-align: center;
-      margin-bottom: 20px;
+        text-align: center;
+        margin-bottom: 20px;
     }
-    input[type="file"], input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
+    input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
     }
     button {
-      padding: 12px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      transition: background-color 0.3s;
+        padding: 12px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        background-color: var(--button-bg, #007bff);
+        color: var(--button-color, #fff);
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #0056b3;
-    }
-    .preview-section {
-      margin-top: 20px;
-    }
-    .preview-section h3 {
-      margin-bottom: 10px;
-      color: #444;
-    }
-    .preview-section .categories {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-    }
-    .category {
-      display: flex;
-      align-items: center;
-    }
-    .category input[type="checkbox"] {
-      margin-right: 10px;
+        background-color: var(--button-hover-bg, #0056b3);
     }
     #downloadLinkContainer {
-      display: none;
-      text-align: center;
-      margin-top: 30px;
+        display: none;
+        text-align: center;
+        margin-top: 30px;
     }
     #downloadLink {
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 16px;
-      display: inline-block;
+        padding: 10px 20px;
+        background-color: var(--download-bg, #28a745);
+        color: var(--download-color, #fff);
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+        display: inline-block;
     }
     #downloadLink:hover {
-      background-color: #218838;
+        background-color: var(--download-hover-bg, #218838);
     }
-  </style>
+    .info {
+        margin-top: 15px;
+        font-size: 14px;
+        color: var(--info-color, #666);
+        text-align: center;
+    }
+
+    /* Light theme */
+    @media (prefers-color-scheme: light) {
+        :root {
+            --background-color: #f4f4f9;
+            --text-color: #333;
+            --header-color: #444;
+            --container-bg: #fff;
+            --button-bg: #007bff;
+            --button-color: #fff;
+            --button-hover-bg: #0056b3;
+            --download-bg: #28a745;
+            --download-color: #fff;
+            --download-hover-bg: #218838;
+            --info-color: #666;
+        }
+    }
+
+    /* Dark theme */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --header-color: #f4f4f9;
+            --container-bg: #1e1e1e;
+            --button-bg: #1a73e8;
+            --button-color: #fff;
+            --button-hover-bg: #1558c7;
+            --download-bg: #34a853;
+            --download-color: #fff;
+            --download-hover-bg: #2a7c44;
+            --info-color: #b0b0b0;
+        }
+    }
+</style>
+
 </head>
 <body>
   <div class="container">
     <h1>Filter and Combine M3U Playlist</h1>
     <div class="input-section">
-      <p>Upload an M3U file or paste a URL to process.</p>
+      <p>Upload an M3U or M3U8 file or paste a URL to process.</p>
       <input type="file" id="m3uFileInput" />
       <input type="text" id="m3uUrlInput" placeholder="Enter M3U URL" />
       <button onclick="processInput()">Process</button>
@@ -108,6 +130,11 @@
       <h3>Your Combined Playlist is Ready:</h3>
       <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
     </div>
+<div class="info">
+      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p>
+	<p>"Created by: LeJuan ATP"</p>
+    </div>
+
   </div>
 
   <script>
