@@ -14,33 +14,34 @@
     h1 {
         text-align: center;
         color: var(--header-color, #444);
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
     .container {
         max-width: 900px;
         margin: auto;
-        padding: 20px;
+        padding: 15px;
         background-color: var(--container-bg, #fff);
         border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .input-section {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
-    input[type="file"] {
+    input[type="file"],
+    input[type="text"] {
         width: 100%;
-        padding: 10px;
-        margin: 10px 0;
+        padding: 8px;
+        margin: 8px 0;
         border: 1px solid #ddd;
         border-radius: 5px;
         box-sizing: border-box;
     }
     button {
-        padding: 12px 20px;
-        font-size: 16px;
+        padding: 10px 18px;
+        font-size: 14px;
         cursor: pointer;
-        margin-top: 10px;
+        margin-top: 8px;
         background-color: var(--button-bg, #007bff);
         color: var(--button-color, #fff);
         border: none;
@@ -53,25 +54,51 @@
     #downloadLinkContainer {
         display: none;
         text-align: center;
-        margin-top: 30px;
+        margin-top: 20px;
     }
     #downloadLink {
-        padding: 10px 20px;
+        padding: 8px 16px;
         background-color: var(--download-bg, #28a745);
         color: var(--download-color, #fff);
         text-decoration: none;
         border-radius: 5px;
-        font-size: 16px;
+        font-size: 14px;
         display: inline-block;
     }
     #downloadLink:hover {
-        background-color: var(--download-hover-bg, #218838);
+        background-color: #218838;
     }
     .info {
-        margin-top: 15px;
-        font-size: 14px;
+        margin-top: 10px;
+        font-size: 12px;
         color: var(--info-color, #666);
         text-align: center;
+    }
+    .categories {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+        padding: 5px;
+    }
+    .category {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: var(--category-bg, #f9f9f9);
+        display: flex;
+        align-items: center; /* Center vertically */
+        cursor: pointer;
+        touch-action: manipulation; /* Make it responsive to touch */
+        transition: background-color 0.3s ease; /* Smooth hover effect */
+        font-weight: 600;
+    }
+    .category:hover {
+        background-color: #eaeaea; /* Highlight when hovered or tapped */
+    }
+
+    .category.selected {
+        background-color: #007bff; /* Highlight selected category */
+        color: white;
     }
 
     /* Light theme */
@@ -86,8 +113,7 @@
             --button-hover-bg: #0056b3;
             --download-bg: #28a745;
             --download-color: #fff;
-            --download-hover-bg: #218838;
-            --info-color: #666;
+            --category-bg: #f9f9f9;
         }
     }
 
@@ -103,12 +129,10 @@
             --button-hover-bg: #1558c7;
             --download-bg: #34a853;
             --download-color: #fff;
-            --download-hover-bg: #2a7c44;
-            --info-color: #b0b0b0;
+            --category-bg: #2b2b2b;
         }
     }
-</style>
-
+  </style>
 </head>
 <body>
   <div class="container">
@@ -128,21 +152,19 @@
 
     <div id="downloadLinkContainer">
       <h3>Your Combined Playlist is Ready:</h3>
-      <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
+      <a id="downloadLink" href="#" download="Combined_Playlist.m3u">Download Combined Playlist</a>
     </div>
-<div class="info">
+    <div class="info">
       <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p>
-	<p>"Created by: LeJuan ATP"</p>
+      <p>"Created by: LeJuan ATP"</p>
     </div>
-
   </div>
 
-  <script>
+    <script>
     let currentContent = '';
     let combinedContent = '';
-    let isFirstHeader = true; // Track the first #EXTM3U
+    let isFirstHeader = true;
 
-    // Process file or URL input
     function processInput() {
       const fileInput = document.getElementById('m3uFileInput');
       const urlInput = document.getElementById('m3uUrlInput');
@@ -158,18 +180,20 @@
         reader.readAsText(file);
       } else if (url) {
         fetch(url)
-          .then(response => response.text())
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch the URL.');
+            return response.text();
+          })
           .then(text => {
             currentContent = cleanM3UContent(text);
             displayCategories(currentContent);
           })
-          .catch(err => alert("Error fetching URL: " + err));
+          .catch(err => alert("Error fetching URL: " + err.message));
       } else {
         alert("Please upload a file or enter a URL.");
       }
     }
 
-    // Clean M3U content
     function cleanM3UContent(content) {
       const lines = content.split('\n').map(line => line.trim());
       const cleanedLines = [];
@@ -180,58 +204,57 @@
       for (const line of lines) {
         if (line.startsWith('#EXTM3U')) {
           if (isFirstHeader) {
-            cleanedLines.push(line); // Add only the first #EXTM3U
+            cleanedLines.push(line);
             isFirstHeader = false;
           }
         } else if (line.startsWith('#EXTINF:')) {
-          lastMetadata = line; // Store the metadata line
+          lastMetadata = line;
         } else if (urlRegex.test(line)) {
           if (lastMetadata) {
-            cleanedLines.push(lastMetadata); // Add metadata + URL pair
-            lastMetadata = ''; // Reset metadata
+            cleanedLines.push(lastMetadata);
+            lastMetadata = '';
           }
           cleanedLines.push(line);
+        } else {
+          cleanedLines.push(line); // Keep all comments now
         }
       }
 
       return cleanedLines.join('\n');
     }
 
-    // Display categories for selection
     function displayCategories(content) {
       const lines = content.split('\n');
       const categories = new Set();
 
-      // Extract categories
       lines.forEach(line => {
-        const match = line.match(/group-title="([^"]+)"/);
+        const match = line.match(/group-title="([^"]+)"/) || line.match(/#\s*([A-Za-z0-9\s]+)\s*#/);
         if (match) {
-          categories.add(match[1]);
+          categories.add(match[1].trim());
         }
       });
 
       const categoryList = document.getElementById('categoryList');
       categoryList.innerHTML = '';
 
-      categories.forEach(category => {
+      [...categories].sort().forEach(category => {
         const categoryDiv = document.createElement('div');
         categoryDiv.classList.add('category');
-        categoryDiv.innerHTML = `
-          <input type="checkbox" value="${category}" />
-          <label>${category}</label>
-        `;
+        categoryDiv.innerHTML = `<span>${category}</span>`;
+        categoryDiv.onclick = function() {
+          categoryDiv.classList.toggle('selected');  // Toggle selected class on click
+        };
         categoryList.appendChild(categoryDiv);
       });
 
-      // Show the preview section
       document.getElementById('previewSection').style.display = 'block';
     }
 
-    // Add selected categories to the combined list
     function addToCombinedContent() {
-      const selectedCategories = Array.from(
-        document.querySelectorAll('#categoryList input[type="checkbox"]:checked')
-      ).map(checkbox => checkbox.value);
+      const selectedCategories = [];
+      document.querySelectorAll('.category.selected').forEach(categoryDiv => {
+        selectedCategories.push(categoryDiv.textContent.trim());
+      });
 
       if (selectedCategories.length === 0) {
         alert("Please select at least one category.");
@@ -239,35 +262,23 @@
       }
 
       const lines = currentContent.split('\n');
-      const filteredLines = [];
-      let includeNextLine = false;
+      const selectedLines = [];
 
-      lines.forEach(line => {
-        const match = line.match(/group-title="([^"]+)"/);
-        if (match) {
-          includeNextLine = selectedCategories.includes(match[1]);
-        }
-        if (includeNextLine || line.startsWith('#EXTM3U')) {
-          filteredLines.push(line);
-        }
+      selectedCategories.forEach(category => {
+        let addLine = false;
+        lines.forEach(line => {
+          if (line.includes(`group-title="${category}"`) || line.includes(`# ${category} #`)) {
+            addLine = true;
+            selectedLines.push(line);
+          }
+        });
       });
 
-      // Append to combined content
-      if (combinedContent) {
-        combinedContent += '\n'; // Ensure a single newline between files
-      }
-      combinedContent += filteredLines.join('\n');
-
-      alert("Selected categories added to the combined playlist.");
-      document.getElementById('downloadLinkContainer').style.display = 'block';
-    }
-
-    // Prepare the combined content for download
-    function prepareDownload() {
-      const blob = new Blob([combinedContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
+      combinedContent = '#EXTM3U\n' + selectedLines.join('\n');
+      const blob = new Blob([combinedContent], { type: 'application/octet-stream' });
       const downloadLink = document.getElementById('downloadLink');
-      downloadLink.href = url;
+      downloadLink.href = URL.createObjectURL(blob);
+      document.getElementById('downloadLinkContainer').style.display = 'block';
     }
   </script>
 </body>
