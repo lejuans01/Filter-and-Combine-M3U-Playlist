@@ -155,7 +155,7 @@
       <a id="downloadLink" href="#" download="Combined_Playlist.m3u">Download Combined Playlist</a>
     </div>
     <div class="info">
-      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p>
+      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p><strong>If URL Fails, Download Playlist 1st.<strong><p>
       <p>"Created by: LeJuan ATP"</p>
     </div>
   </div>
@@ -165,34 +165,41 @@
     let combinedContent = '';
     let isFirstHeader = true;
 
-    function processInput() {
-      const fileInput = document.getElementById('m3uFileInput');
-      const urlInput = document.getElementById('m3uUrlInput');
-      const file = fileInput.files[0];
-      const url = urlInput.value.trim();
+function processInput() {
+  const fileInput = document.getElementById('m3uFileInput');
+  const urlInput = document.getElementById('m3uUrlInput');
+  const file = fileInput.files[0];
+  const url = urlInput.value.trim();
 
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          currentContent = cleanM3UContent(event.target.result);
-          displayCategories(currentContent);
-        };
-        reader.readAsText(file);
-      } else if (url) {
-        fetch(url)
-          .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch the URL.');
-            return response.text();
-          })
-          .then(text => {
-            currentContent = cleanM3UContent(text);
-            displayCategories(currentContent);
-          })
-          .catch(err => alert("Error fetching URL: " + err.message));
-      } else {
-        alert("Please upload a file or enter a URL.");
-      }
-    }
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      currentContent = cleanM3UContent(event.target.result);
+      displayCategories(currentContent);
+    };
+    reader.readAsText(file);
+  } else if (url) {
+    // Try fetching the file from the URL
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch the URL.');
+        // Check the content type header for playlists
+        const contentType = response.headers.get('content-type');
+        if (contentType && (contentType.includes('audio/mpegurl') || contentType.includes('application/vnd.apple.mpegurl'))) {
+          return response.text();
+        }
+        // If no playlist header, assume text content and attempt to parse it
+        return response.text();
+      })
+      .then(text => {
+        currentContent = cleanM3UContent(text);
+        displayCategories(currentContent);
+      })
+      .catch(err => alert("Error fetching URL or invalid playlist format: " + err.message));
+  } else {
+    alert("Please upload a file or enter a URL.");
+  }
+}
 
     function cleanM3UContent(content) {
       const lines = content.split('\n').map(line => line.trim());
