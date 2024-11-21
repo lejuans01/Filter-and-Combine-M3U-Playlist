@@ -14,34 +14,33 @@
     h1 {
         text-align: center;
         color: var(--header-color, #444);
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     .container {
         max-width: 900px;
         margin: auto;
-        padding: 15px;
+        padding: 20px;
         background-color: var(--container-bg, #fff);
         border-radius: 10px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     .input-section {
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
-    input[type="file"],
-    input[type="text"] {
+    input[type="file"], input[type="text"] {
         width: 100%;
-        padding: 8px;
-        margin: 8px 0;
+        padding: 10px;
+        margin: 10px 0;
         border: 1px solid #ddd;
         border-radius: 5px;
         box-sizing: border-box;
     }
     button {
-        padding: 10px 18px;
-        font-size: 14px;
+        padding: 12px 20px;
+        font-size: 16px;
         cursor: pointer;
-        margin-top: 8px;
+        margin-top: 10px;
         background-color: var(--button-bg, #007bff);
         color: var(--button-color, #fff);
         border: none;
@@ -51,54 +50,53 @@
     button:hover {
         background-color: var(--button-hover-bg, #0056b3);
     }
+    #previewSection {
+        margin-top: 20px;
+    }
+    #categoryList {
+        display: flex;
+        flex-wrap: wrap; /* Allows wrapping to the next row */
+        gap: 10px; /* Adds spacing between items */
+        justify-content: center; /* Center-aligns the categories */
+    }
+    .category {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        min-width: 150px; /* Adjusts minimum size for consistent columns */
+        transition: background-color 0.3s, color 0.3s;
+        flex: 1 1 calc(33.333% - 20px); /* Three items per row, adjust if needed */
+        box-sizing: border-box; /* Ensures padding and border are included in width */
+    }
+    .category[data-selected="true"] {
+        background-color: #007bff;
+        color: #fff;
+    }
     #downloadLinkContainer {
         display: none;
         text-align: center;
-        margin-top: 20px;
+        margin-top: 30px;
     }
     #downloadLink {
-        padding: 8px 16px;
+        padding: 10px 20px;
         background-color: var(--download-bg, #28a745);
         color: var(--download-color, #fff);
         text-decoration: none;
         border-radius: 5px;
-        font-size: 14px;
+        font-size: 16px;
         display: inline-block;
     }
     #downloadLink:hover {
-        background-color: #218838;
+        background-color: var(--download-hover-bg, #218838);
     }
     .info {
-        margin-top: 10px;
-        font-size: 12px;
+        margin-top: 15px;
+        font-size: 14px;
         color: var(--info-color, #666);
         text-align: center;
-    }
-    .categories {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 8px;
-        padding: 5px;
-    }
-    .category {
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: var(--category-bg, #f9f9f9);
-        display: flex;
-        align-items: center; /* Center vertically */
-        cursor: pointer;
-        touch-action: manipulation; /* Make it responsive to touch */
-        transition: background-color 0.3s ease; /* Smooth hover effect */
-        font-weight: 600;
-    }
-    .category:hover {
-        background-color: #eaeaea; /* Highlight when hovered or tapped */
-    }
-
-    .category.selected {
-        background-color: #007bff; /* Highlight selected category */
-        color: white;
     }
 
     /* Light theme */
@@ -113,7 +111,8 @@
             --button-hover-bg: #0056b3;
             --download-bg: #28a745;
             --download-color: #fff;
-            --category-bg: #f9f9f9;
+            --download-hover-bg: #218838;
+            --info-color: #666;
         }
     }
 
@@ -129,7 +128,8 @@
             --button-hover-bg: #1558c7;
             --download-bg: #34a853;
             --download-color: #fff;
-            --category-bg: #2b2b2b;
+            --download-hover-bg: #2a7c44;
+            --info-color: #b0b0b0;
         }
     }
   </style>
@@ -152,60 +152,50 @@
 
     <div id="downloadLinkContainer">
       <h3>Your Combined Playlist is Ready:</h3>
-      <a id="downloadLink" href="#" download="Combined_Playlist.m3u">Download Combined Playlist</a>
+      <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
     </div>
     <div class="info">
-      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p><strong>If URL Fails, Download Playlist 1st.<strong><p>
+      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p><strong>
+        If URL Fails, Download Playlist 1st.<strong><p>
       <p>"Created by: LeJuan ATP"</p>
     </div>
   </div>
 
-    <script>
+  <script>
     let currentContent = '';
     let combinedContent = '';
     let isFirstHeader = true;
 
-function processInput() {
-  const fileInput = document.getElementById('m3uFileInput');
-  const urlInput = document.getElementById('m3uUrlInput');
-  const file = fileInput.files[0];
-  const url = urlInput.value.trim();
+    function processInput() {
+      const fileInput = document.getElementById('m3uFileInput');
+      const urlInput = document.getElementById('m3uUrlInput');
+      const file = fileInput.files[0];
+      const url = urlInput.value.trim();
 
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      currentContent = cleanM3UContent(event.target.result);
-      displayCategories(currentContent);
-    };
-    reader.readAsText(file);
-  } else if (url) {
-    // Try fetching the file from the URL
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch the URL.');
-        // Check the content type header for playlists
-        const contentType = response.headers.get('content-type');
-        if (contentType && (contentType.includes('audio/mpegurl') || contentType.includes('application/vnd.apple.mpegurl'))) {
-          return response.text();
-        }
-        // If no playlist header, assume text content and attempt to parse it
-        return response.text();
-      })
-      .then(text => {
-        currentContent = cleanM3UContent(text);
-        displayCategories(currentContent);
-      })
-      .catch(err => alert("Error fetching URL or invalid playlist format: " + err.message));
-  } else {
-    alert("Please upload a file or enter a URL.");
-  }
-}
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          currentContent = cleanM3UContent(event.target.result);
+          displayCategories(currentContent);
+        };
+        reader.readAsText(file);
+      } else if (url) {
+        fetch(url)
+          .then(response => response.text())
+          .then(text => {
+            currentContent = cleanM3UContent(text);
+            displayCategories(currentContent);
+          })
+          .catch(err => alert("Error fetching URL: " + err));
+      } else {
+        alert("Please upload a file or enter a URL.");
+      }
+    }
 
     function cleanM3UContent(content) {
       const lines = content.split('\n').map(line => line.trim());
       const cleanedLines = [];
       const urlRegex = /^https?:\/\//;
-
       let lastMetadata = '';
 
       for (const line of lines) {
@@ -222,11 +212,8 @@ function processInput() {
             lastMetadata = '';
           }
           cleanedLines.push(line);
-        } else {
-          cleanedLines.push(line); // Keep all comments now
         }
       }
-
       return cleanedLines.join('\n');
     }
 
@@ -235,22 +222,26 @@ function processInput() {
       const categories = new Set();
 
       lines.forEach(line => {
-        const match = line.match(/group-title="([^"]+)"/) || line.match(/#\s*([A-Za-z0-9\s]+)\s*#/);
+        const match = line.match(/group-title="([^"]+)"/);
         if (match) {
-          categories.add(match[1].trim());
+          categories.add(match[1]);
         }
       });
 
       const categoryList = document.getElementById('categoryList');
       categoryList.innerHTML = '';
 
-      [...categories].sort().forEach(category => {
+      categories.forEach(category => {
         const categoryDiv = document.createElement('div');
         categoryDiv.classList.add('category');
-        categoryDiv.innerHTML = `<span>${category}</span>`;
-        categoryDiv.onclick = function() {
-          categoryDiv.classList.toggle('selected');  // Toggle selected class on click
-        };
+        categoryDiv.textContent = category;
+        categoryDiv.dataset.selected = 'false';
+        categoryDiv.addEventListener('click', () => {
+          const isSelected = categoryDiv.dataset.selected === 'true';
+          categoryDiv.dataset.selected = isSelected ? 'false' : 'true';
+          categoryDiv.style.backgroundColor = isSelected ? 'transparent' : '#007bff';
+          categoryDiv.style.color = isSelected ? '#333' : '#fff';
+        });
         categoryList.appendChild(categoryDiv);
       });
 
@@ -258,10 +249,9 @@ function processInput() {
     }
 
     function addToCombinedContent() {
-      const selectedCategories = [];
-      document.querySelectorAll('.category.selected').forEach(categoryDiv => {
-        selectedCategories.push(categoryDiv.textContent.trim());
-      });
+      const selectedCategories = Array.from(
+        document.querySelectorAll('#categoryList .category[data-selected="true"]')
+      ).map(div => div.textContent);
 
       if (selectedCategories.length === 0) {
         alert("Please select at least one category.");
@@ -269,23 +259,32 @@ function processInput() {
       }
 
       const lines = currentContent.split('\n');
-      const selectedLines = [];
+      const filteredLines = [];
+      let includeNextLine = false;
 
-      selectedCategories.forEach(category => {
-        let addLine = false;
-        lines.forEach(line => {
-          if (line.includes(`group-title="${category}"`) || line.includes(`# ${category} #`)) {
-            addLine = true;
-            selectedLines.push(line);
-          }
-        });
+      lines.forEach(line => {
+        const match = line.match(/group-title="([^"]+)"/);
+        if (match) {
+          includeNextLine = selectedCategories.includes(match[1]);
+        }
+        if (includeNextLine || line.startsWith('#EXTM3U')) {
+          filteredLines.push(line);
+        }
       });
 
-      combinedContent = '#EXTM3U\n' + selectedLines.join('\n');
-      const blob = new Blob([combinedContent], { type: 'application/octet-stream' });
-      const downloadLink = document.getElementById('downloadLink');
-      downloadLink.href = URL.createObjectURL(blob);
+      if (combinedContent) {
+        combinedContent += '\n';
+      }
+      combinedContent += filteredLines.join('\n');
+
+      alert("Selected categories added to the combined playlist.");
       document.getElementById('downloadLinkContainer').style.display = 'block';
+    }
+
+    function prepareDownload() {
+      const blob = new Blob([combinedContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      document.getElementById('downloadLink').href = url;
     }
   </script>
 </body>
