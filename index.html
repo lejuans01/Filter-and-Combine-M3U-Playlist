@@ -5,114 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filter and Combine M3U Playlist</title>
   <style>
+    /* Light and Dark Themes */
     body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: var(--background-color, #f4f4f9);
-        color: var(--text-color, #333);
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
     }
-    h1 {
-        text-align: center;
-        color: var(--header-color, #444);
-        margin-bottom: 20px;
+
+    body.dark-mode {
+      background-color: #333;
+      color: #f1f1f1;
     }
+
     .container {
-        max-width: 900px;
-        margin: auto;
-        padding: 20px;
-        background-color: var(--container-bg, #fff);
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
     }
+
+    h1 {
+      text-align: center;
+    }
+
     .input-section {
-        text-align: center;
-        margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
-    input[type="file"],
-    input[type="text"] {
-        width: 100%;
-        max-width: 500px; /* Set max width for inputs */
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-sizing: border-box;
+
+    .input-section input {
+      width: 40%;
+      padding: 10px;
+      margin-right: 10px;
     }
-    button {
-        padding: 12px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-        background-color: var(--button-bg, #007bff);
-        color: var(--button-color, #fff);
-        border: none;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+
+    .input-section button {
+      padding: 10px 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-    button:hover {
-        background-color: var(--button-hover-bg, #0056b3);
+
+    .input-section button:hover {
+      background-color: #004d40;
     }
-    #downloadLinkContainer {
-        display: none;
-        text-align: center;
-        margin-top: 30px;
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
     }
-    #downloadLink {
-        padding: 10px 20px;
-        background-color: var(--download-bg, #28a745);
-        color: var(--download-color, #fff);
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 16px;
-        display: inline-block;
+
+    .category-btn {
+      padding: 10px 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
     }
-    #downloadLink:hover {
-        background-color: var(--download-hover-bg, #218838);
+
+    .category-btn:hover {
+      background-color: #004d40;
     }
+
+    .selected-category {
+      background-color: #004d40;
+    }
+
     .info {
-        margin-top: 15px;
-        font-size: 14px;
-        color: var(--info-color, #666);
-        text-align: center;
+      text-align: center;
+      margin-top: 20px;
     }
 
-    /* Light theme */
-    @media (prefers-color-scheme: light) {
-        :root {
-            --background-color: #f4f4f9;
-            --text-color: #333;
-            --header-color: #444;
-            --container-bg: #fff;
-            --button-bg: #007bff;
-            --button-color: #fff;
-            --button-hover-bg: #0056b3;
-            --download-bg: #28a745;
-            --download-color: #fff;
-            --download-hover-bg: #218838;
-            --info-color: #666;
-        }
+    #downloadLinkContainer {
+      display: none;
     }
 
-    /* Dark theme */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --background-color: #121212;
-            --text-color: #e0e0e0;
-            --header-color: #f4f4f9;
-            --container-bg: #1e1e1e;
-            --button-bg: #1a73e8;
-            --button-color: #fff;
-            --button-hover-bg: #1558c7;
-            --download-bg: #34a853;
-            --download-color: #fff;
-            --download-hover-bg: #2a7c44;
-            --info-color: #b0b0b0;
-        }
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-</style>
 
+    .theme-toggle-btn:hover {
+      background-color: #004d40;
+    }
+  </style>
 </head>
 <body>
+  <button class="theme-toggle-btn" onclick="toggleTheme()">Toggle Dark/Light Theme</button>
+
   <div class="container">
     <h1>Filter and Combine M3U Playlist</h1>
     <div class="input-section">
@@ -132,50 +127,13 @@
       <h3>Your Combined Playlist is Ready:</h3>
       <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
     </div>
-
     <div class="info">
-      <p>Only valid <strong>.m3u</strong> and <strong>.m3u8</strong> formats are supported. Malformed entries will be skipped.</p>
-      <p>"Created by: LeJuan ATP"</p>
+      <p>Only Valid .M3U and .M3U8 Formats are Supported. Malformed Entries will be Skipped.</p>
+      <p><strong>If URL Fails, Download Playlist 1st.</strong></p>
+      <p><i>"Created by: LeJuan ATP"</i></p>
     </div>
-
   </div>
 
-  <script>
-    // Your JavaScript functionality here
-    function processInput() {
-        const fileInput = document.getElementById('m3uFileInput');
-        const urlInput = document.getElementById('m3uUrlInput');
-        const file = fileInput.files[0];
-        const url = urlInput.value.trim();
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                // Handle file processing here
-            };
-            reader.readAsText(file);
-        } else if (url) {
-            fetch(url)
-                .then(response => response.text())
-                .then(text => {
-                    // Handle URL processing here
-                })
-                .catch(err => alert("Error fetching URL: " + err));
-        } else {
-            alert("Please upload a file or enter a URL.");
-        }
-    }
-
-    function addToCombinedContent() {
-        // Handle adding selected categories to the combined content
-    }
-
-    function prepareDownload() {
-        // Prepare the combined playlist for download
-    }
-  </script>
-</body>
-</html>
   <script>
     // Switch between light and dark theme
     function toggleTheme() {
@@ -308,7 +266,7 @@
         }
         combinedContent += filteredLines.join('\n');
 
-        alert(`Categories added to the combined playlist.`);
+        alert(`Selected categories added to the combined playlist.`);
         document.getElementById('downloadLinkContainer').style.display = 'block';
     }
 
