@@ -22,7 +22,9 @@ This web-based tool allows users to upload an M3U playlist file or provide a URL
 2. Select the categories you want to include.
 3. Click on the button to add the selected categories to the combined playlist.
 4. Once the playlist is ready, click the download link to save the combined playlist.
+5. If upload of imported `URL` doesn't work, then click as-if you want to `Choose a file` ( to clear the feild ), then try `URL` again to continue.
 
+ 
 ## License
 
 [MIT License](LICENSE)
