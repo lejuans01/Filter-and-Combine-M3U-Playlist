@@ -1,281 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Filter and Combine M3U Playlist</title>
-  <style>
-    /* Light and Dark Themes */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s, color 0.3s;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter and Combine M3U Playlist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    body.dark-mode {
-      background-color: #333;
-      color: #f1f1f1;
-    }
+        body.dark-mode {
+            background-color: #333;
+            color: #f1f1f1;
+        }
 
-    .container {
-      width: 80%;
-      margin: 0 auto;
-      padding: 20px;
-    }
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
 
-    h1 {
-      text-align: center;
-    }
+        h1 {
+            text-align: center;
+        }
 
-    .input-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .input-section input {
-      width: 40%;
-      padding: 10px;
-      margin-right: 10px;
-    }
+        .input-section p,
+        .input-section input,
+        .input-section button {
+            width: 100%;
+            margin-bottom: 10px;
+            max-width: 500px;
+        }
 
-    .input-section button {
-      padding: 10px 20px;
-      background-color: #00796b;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+        .input-section input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
 
-    .input-section button:hover {
-      background-color: #004d40;
-    }
+        .input-section button {
+            padding: 10px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-    .categories {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+        .input-section button:hover {
+            background-color: #004d40;
+        }
 
-    .category-btn {
-      padding: 10px 20px;
-      background-color: #00796b;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .category-btn:hover {
-      background-color: #004d40;
-    }
+        .category-btn {
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-    .selected-category {
-      background-color: #004d40;
-    }
+        .category-btn:hover {
+            background-color: #004d40;
+        }
 
-    .info {
-      text-align: center;
-      margin-top: 20px;
-    }
+        .selected-category {
+            background-color: #004d40;
+        }
 
-    #downloadLinkContainer {
-      display: none;
-    }
+        .info {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-    /* Theme Toggle Button */
-    .theme-toggle-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background-color: #00796b;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+        #downloadLinkContainer {
+            display: none;
+        }
 
-    .theme-toggle-btn:hover {
-      background-color: #004d40;
-    }
-  </style>
+        .theme-toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle-container input[type="checkbox"] {
+            display: none;
+        }
+
+        .theme-toggle-container label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            background-color: #00796b;
+            border-radius: 15px;
+            padding: 5px 10px;
+            color: white;
+        }
+
+        .theme-toggle-container label:hover {
+            background-color: #004d40;
+        }
+
+        .theme-toggle-container label:before {
+            content: '🌞';
+            margin-right: 8px;
+        }
+
+        .theme-toggle-container input[type="checkbox"]:checked + label {
+            background-color: #004d40;
+        }
+
+        .theme-toggle-container input[type="checkbox"]:checked + label:before {
+            content: '🌜';
+        }
+    </style>
 </head>
+
 <body>
-  <button class="theme-toggle-btn" onclick="toggleTheme()">Toggle Dark/Light Theme</button>
-
-  <div class="container">
-    <h1>Filter and Combine M3U Playlist</h1>
-    <div class="input-section">
-      <p>Upload an M3U or M3U8 file or paste a URL to process.</p>
-      <input type="file" id="m3uFileInput" />
-      <input type="text" id="m3uUrlInput" placeholder="Enter M3U URL" />
-      <button onclick="processInput()">Process</button>
+    <div class="theme-toggle-container">
+        <input type="checkbox" id="darkModeToggle" onclick="toggleTheme()">
+        <label for="darkModeToggle">Dark/Light Mode</label>
     </div>
 
-    <div id="previewSection" class="preview-section" style="display: none;">
-      <h3>Categories in Uploaded Content:</h3>
-      <div id="categoryList" class="categories"></div>
-      <button onclick="addToCombinedContent()">Add Selected Categories</button>
+    <div class="container">
+        <h1>Filter and Combine M3U Playlist</h1>
+        <div class="input-section">
+            <p>Upload M3U or M3U8 files or paste URLs to process.</p>
+            <input type="file" id="m3uFileInput" multiple />
+            <input type="text" id="m3uUrlInput" placeholder="Enter M3U URL &rarr;" />
+            <button onclick="processInput()">Process</button>
+        </div>
+
+        <div id="previewSection" class="preview-section" style="display: none;">
+            <h3>Categories in Uploaded Content:</h3>
+            <div id="categoryList" class="categories"></div>
+            <button onclick="addToCombinedContent()">Add Selected Categories</button>
+        </div>
+
+        <div id="downloadLinkContainer">
+            <h3>Your Combined Playlist is Ready:</h3>
+            <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
+        </div>
+        <div class="info">
+            <p>Only Valid .M3U and .M3U8 Formats are Supported. Malformed Entries will be Skipped.</p>
+            <p><strong>If URL Fails, Download Playlist 1st.</strong></p>
+            <p><i>"Created by: LeJuan ATP"</i></p>
+        </div>
     </div>
 
-    <div id="downloadLinkContainer">
-      <h3>Your Combined Playlist is Ready:</h3>
-      <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
-    </div>
-    <div class="info">
-      <p>Only Valid .M3U and .M3U8 Formats are Supported. Malformed Entries will be Skipped.</p>
-      <p><strong>If URL Fails, Download Playlist 1st.</strong></p>
-      <p><i>"Created by: LeJuan ATP"</i></p>
-    </div>
-  </div>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+        }
 
-  <script>
-    // Switch between light and dark theme
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('dark-mode');
-    }
+        let currentContent = '';
+        let combinedContent = '';
+        let isFirstHeader = true;
+        let fallbackGroupName = '';
 
-    let currentContent = '';
-    let combinedContent = '';
-    let isFirstHeader = true; // Ensure only one #EXTM3U
-    let fallbackGroupName = ''; // For grouping based on filename if no group-title is present
+        // This function processes both file and URL input
+        function processInput() {
+            const fileInput = document.getElementById('m3uFileInput');
+            const urlInput = document.getElementById('m3uUrlInput');
+            const files = fileInput.files;
+            const urls = urlInput.value.trim().split('\n').map(url => url.trim()).filter(url => url.length > 0);
 
-    function processInput() {
-        const fileInput = document.getElementById('m3uFileInput');
-        const urlInput = document.getElementById('m3uUrlInput');
-        const file = fileInput.files[0];
-        const url = urlInput.value.trim();
+            // Reset previous content to avoid mixing files and URLs
+            currentContent = '';
+            document.getElementById('categoryList').innerHTML = '';
 
-        if (file) {
-            fallbackGroupName = file.name.replace(/\.[^/.]+$/, ''); // Remove file extension
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                currentContent = cleanM3UContent(event.target.result);
-                displayCategories(currentContent);
-            };
-            reader.readAsText(file);
-        } else if (url) {
-            fallbackGroupName = 'Unknown'; // Default fallback for URLs
-            fetch(url)
-                .then(response => response.text())
-                .then(text => {
-                    currentContent = cleanM3UContent(text);
+            // Process files if present
+            if (files.length > 0) {
+                processFiles(files);
+            }
+
+            // Process URLs if present
+            if (urls.length > 0) {
+                processUrls(urls);
+            }
+
+            if (files.length === 0 && urls.length === 0) {
+                alert("Please upload files or enter valid URLs.");
+            }
+        }
+
+        // Handle file inputs
+        function processFiles(files) {
+            Array.from(files).forEach(file => {
+                fallbackGroupName = file.name.replace(/\.[^/.]+$/, ''); // Get a fallback group name based on file name
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    currentContent += cleanM3UContent(event.target.result);
                     displayCategories(currentContent);
-                })
-                .catch(err => alert("Error fetching URL: " + err));
-        } else {
-            alert("Please upload a file or enter a URL.");
+                };
+                reader.readAsText(file);
+            });
         }
-    }
 
-    function cleanM3UContent(content) {
-        const lines = content.split('\n').map(line => line.trim());
-        const cleanedLines = [];
-        const urlRegex = /^https?:\/\//;
+        // Handle URL inputs
+        function processUrls(urls) {
+            urls.forEach(url => {
+                fetch(url)
+                    .then(response => response.text())
+                    .then(text => {
+                        currentContent += cleanM3UContent(text);
+                        displayCategories(currentContent);
+                    })
+                    .catch(err => alert("Error fetching URL: " + err));
+            });
+        }
 
-        let lastMetadata = '';
-        let hasGroupTitles = false; // Flag to detect if group-title exists
+        // Clean and process M3U content (both files and URLs)
+        function cleanM3UContent(content) {
+            const lines = content.split('\n').map(line => line.trim());
+            const cleanedLines = [];
+            const urlRegex = /^https?:\/\//;
 
-        for (const line of lines) {
-            if (line.startsWith('#EXTM3U')) {
-                if (isFirstHeader) {
-                    cleanedLines.push(line); // Add only the first #EXTM3U
-                    isFirstHeader = false;
-                }
-            } else if (line.startsWith('#EXTINF:')) {
-                const groupMatch = line.match(/group-title="([^"]+)"/);
-                if (groupMatch) {
-                    hasGroupTitles = true; // Detect group-title in the file
-                }
-                lastMetadata = line; // Store the metadata line
-            } else if (urlRegex.test(line)) {
-                if (lastMetadata) {
-                    // Add group-title if missing, based on fallback
-                    if (!hasGroupTitles) {
-                        lastMetadata = lastMetadata.replace(
-                            /(group-title="[^"]*")?/,
-                            `group-title="${fallbackGroupName}"`
-                        );
+            let lastMetadata = '';
+            let hasGroupTitles = false;
+
+            for (const line of lines) {
+                if (line.startsWith('#EXTM3U')) {
+                    if (isFirstHeader) {
+                        cleanedLines.push(line);
+                        isFirstHeader = false;
                     }
-                    cleanedLines.push(lastMetadata); // Add metadata + URL pair
-                    lastMetadata = ''; // Reset metadata
+                } else if (line.startsWith('#EXTINF:')) {
+                    const groupMatch = line.match(/group-title="([^"]+)"/);
+                    if (groupMatch) {
+                        hasGroupTitles = true;
+                    }
+                    lastMetadata = line;
+                } else if (urlRegex.test(line)) {
+                    if (lastMetadata) {
+                        if (!hasGroupTitles) {
+                            lastMetadata = lastMetadata.replace(
+                                /(group-title="[^"]*")?/,
+                                `group-title="${fallbackGroupName}"`
+                            );
+                        }
+                        cleanedLines.push(lastMetadata);
+                        lastMetadata = '';
+                    }
+                    cleanedLines.push(line); // Keep the URL
                 }
-                cleanedLines.push(line);
             }
+
+            return cleanedLines.join('\n');
         }
 
-        return cleanedLines.join('\n');
-    }
+        // Display categories based on the processed content
+        function displayCategories(content) {
+            const lines = content.split('\n');
+            const categories = new Set();
 
-    function displayCategories(content) {
-        const lines = content.split('\n');
-        const categories = new Set();
+            lines.forEach(line => {
+                const match = line.match(/group-title="([^"]+)"/);
+                if (match) {
+                    categories.add(match[1]);
+                }
+            });
 
-        // Extract categories
-        lines.forEach(line => {
-            const match = line.match(/group-title="([^"]+)"/);
-            if (match) {
-                categories.add(match[1]);
-            }
-        });
+            const categoryList = document.getElementById('categoryList');
+            categoryList.innerHTML = '';
 
-        const categoryList = document.getElementById('categoryList');
-        categoryList.innerHTML = '';
+            categories.forEach(category => {
+                const categoryButton = document.createElement('button');
+                categoryButton.classList.add('category-btn');
+                categoryButton.textContent = category;
+                categoryButton.onclick = function () {
+                    categoryButton.classList.toggle('selected-category');
+                };
+                categoryList.appendChild(categoryButton);
+            });
 
-        categories.forEach(category => {
-            const categoryButton = document.createElement('button');
-            categoryButton.classList.add('category-btn');
-            categoryButton.textContent = category;
-            categoryButton.onclick = function () {
-                categoryButton.classList.toggle('selected-category'); // Toggle selection
-            };
-            categoryList.appendChild(categoryButton);
-        });
-
-        // Show the preview section
-        document.getElementById('previewSection').style.display = 'block';
-    }
-
-    function addToCombinedContent() {
-        const selectedCategories = document.querySelectorAll('.selected-category');
-        const selectedCategoryNames = Array.from(selectedCategories).map(button => button.textContent);
-
-        const lines = currentContent.split('\n');
-        const filteredLines = [];
-        let includeNextLine = false;
-
-        lines.forEach(line => {
-            const match = line.match(/group-title="([^"]+)"/);
-            if (match) {
-                includeNextLine = selectedCategoryNames.includes(match[1]);
-            }
-            if (includeNextLine || line.startsWith('#EXTM3U')) {
-                filteredLines.push(line);
-            }
-        });
-
-        // Append to combined content
-        if (combinedContent) {
-            combinedContent += '\n'; // Ensure a single newline between files
+            document.getElementById('previewSection').style.display = 'block';
         }
-        combinedContent += filteredLines.join('\n');
 
-        alert(`Selected categories added to the combined playlist.`);
-        document.getElementById('downloadLinkContainer').style.display = 'block';
-    }
+        // Add selected categories to the combined content
+        function addToCombinedContent() {
+            const selectedCategories = document.querySelectorAll('.selected-category');
+            const selectedCategoryNames = Array.from(selectedCategories).map(button => button.textContent);
 
-    function prepareDownload() {
-        const blob = new Blob([combinedContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.getElementById('downloadLink');
-        downloadLink.href = url;
-    }
-  </script>
+            const lines = currentContent.split('\n');
+            const filteredLines = [];
+            let includeNextLine = false;
+
+            lines.forEach(line => {
+                const match = line.match(/group-title="([^"]+)"/);
+                if (match) {
+                    includeNextLine = selectedCategoryNames.includes(match[1]);
+                }
+                if (includeNextLine || line.startsWith('#EXTM3U')) {
+                    filteredLines.push(line);
+                }
+            });
+
+            if (combinedContent) {
+                combinedContent += '\n';
+            }
+            combinedContent += filteredLines.join('\n');
+
+            alert(`Selected categories added to the combined playlist.`);
+            document.getElementById('downloadLinkContainer').style.display = 'block';
+        }
+
+        // Prepare the download link for the combined playlist
+        function prepareDownload() {
+            const blob = new Blob([combinedContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+        }
+    </script>
 </body>
+
 </html>
