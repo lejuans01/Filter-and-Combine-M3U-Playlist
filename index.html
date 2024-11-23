@@ -93,6 +93,13 @@
             text-align: center;
             margin-top: 20px;
         }
+        .info pre {
+            white-space: pre-wrap; /* Added for mobile responsiveness */
+            font-family: monospace; /* Or a suitable code font */
+            padding: 10px; /* Optional for better readability */
+            border: 1px solid #ddd; /* Optional for visual separation */
+            border-radius: 5px; /* Optional for styling */
+        }
 
         #downloadLinkContainer {
             display: none;
@@ -124,7 +131,7 @@
         }
 
         .theme-toggle-container label:before {
-            content: '🌞';
+            content: 'ðŸŒž';
             margin-right: 8px;
         }
 
@@ -133,7 +140,7 @@
         }
 
         .theme-toggle-container input[type="checkbox"]:checked + label:before {
-            content: '🌜';
+            content: 'ðŸŒœ';
         }
     </style>
 </head>
@@ -164,8 +171,9 @@
             <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
         </div>
         <div class="info">
-            <pre>Only Valid <b>.M3U</b> and <b>.M3U8</b> Formats are Supported. Malformed Entries will be Skipped.</pre>
-            <pre>If upload of imported <b>"M3U URL"</b> doesn't work, then click as-if you want to <b>"Choose Files"</b> (to clear the feild), then try <b>URL</b> again to continue.</pre>
+            <pre class="word-wrap">
+           Only Valid <b>.M3U</b> and <b>.M3U8</b> Formats are Supported. Malformed Entries will be Skipped.</pre>
+            <pre>If upload of imported <b>"M3U URL"</b> doesn't work, then click as-if you want to <b>"Choose Files"</b> (to clear the field), then try <b>URL</b> again to continue.</pre>
             <pre><b>If M3U URL Fails, Download Playlist 1st.</b></pre>
             <pre><i>"Created by: LeJuan ATP"</i></pre>
         </div>
@@ -339,4 +347,5 @@
     </script>
 </body>
 
-</html>
+            </html>
+            
