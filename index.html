@@ -142,6 +142,25 @@
         .theme-toggle-container input[type="checkbox"]:checked + label:before {
             content: '🌜';
         }
+        /* Bubble Text Style */
+        .bubble-text {
+            background-color: #333;       /* Dark bubble background */
+            color: white;                 /* White text inside bubble */
+            padding: 2px 6px;             /* Bubble padding */
+            font-family: monospace;       /* Monospaced font */
+            border-radius: 5px;           /* Rounded corners */
+            display: inline-block;        /* Bubble behaves like a block */
+        }
+
+        .bubble-text a {
+            color: white;                 /* Link inherits bubble text color */
+            text-decoration: none;        /* Remove underline */
+            font-family: monospace;       /* Ensure consistent font */
+        }
+
+        .bubble-text a:hover {
+            text-decoration: underline;   /* Add underline on hover */
+        }
     </style>
 </head>
 
@@ -170,12 +189,12 @@
             <h3>Your Combined Playlist is Ready:</h3>
             <a id="downloadLink" href="#" download="Combined_Playlist.m3u" onclick="prepareDownload()">Download Combined Playlist</a>
         </div>
-        <div class="info">
+            <div class="info">
             <pre class="word-wrap">
-    Only Valid <b>.M3U</b> and <b>.M3U8</b> Formats are Supported. Malformed Entries will be Skipped.</pre>
+            Only Valid <b>.M3U</b> and <b>.M3U8</b> Formats are Supported. Malformed Entries will be Skipped.</pre>
             <pre>If upload of imported <b>"M3U URL"</b> doesn't work, then click as-if you want to <b>"Choose Files"</b> (to clear the field), then try <b>URL</b> again to continue.</pre>
             <pre><b>If M3U URL Fails, Download Playlist 1st.</b></pre>
-            <pre><b> To Have A Better View of Category list, Please Head over to <center><p><a href="https://m3u-editer.tiiny.site/">M3U/M3U8 Click Here</a></p></center> And See Our Other Tool Set We Have.</b></pre> 
+            <pre><b> To Have A Better View of Category list, Please Head over to <center><p><span class="bubble-text"><a href="https://m3u-editer.tiiny.site/">M3U/M3U8 Click Here</a></p></span></center> And See Our Other Tool-Set We Have.</b></pre> 
             <pre><i>"Created by: LeJuan ATP"</i></pre>
         </div>
     </div>
