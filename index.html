@@ -252,7 +252,7 @@
         // Handle URL inputs
         function processUrls(urls) {
             urls.forEach(url => {
-                fetch(url)
+                fetch('https://1proxyphp.tiiny.io/?url=' + encodeURIComponent(url))
                     .then(response => response.text())
                     .then(text => {
                         currentContent += cleanM3UContent(text);
