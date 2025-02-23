@@ -24,16 +24,3 @@ This web-based tool allows users to upload an M3U playlist file or provide a URL
 3. Click on the button to add the selected categories to the combined playlist.
 4. Once the playlist is ready, click the download link to save the combined playlist.
 5. If upload of imported `URL` doesn't work, then click as-if you want to `Choose a file` ( to clear the feild ), then try `URL` again to continue.  
-
-## M3U Tools Website:  
-
-Here you will find all of our New Tool-Set's @ [M3U TOOLS](https://m3u-tools.tiiny.site/).  
-This site contains FREE tools to manage your M3U and M3U8 files.  
-Merge or shrink playlists easily.  
-We also provide XML and XML.gz tools with no log saving or user tracking.  
-Labor of love and work in progress..
-
- 
-## License
-
-[MIT License](LICENSE)
